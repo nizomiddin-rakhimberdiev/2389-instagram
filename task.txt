@@ -1,0 +1,14 @@
+1. Yangi papka ochish
+2. venv yaratish
+3. venv ni activate qilish
+4. pip install django pillow
+5. config project yaratish
+6. posts va users applar yaratish
+7. settingga applar qo'shish, templates qo'shish
+8. timezoneni to'g'rilash
+9. users app models.py da CustomUser yaratish :
+    (phone, avatar, bio)
+    setting.py oxiriga AUTH_USER_MODEL = 'users.CustomUser'
+10. posts app models.py Post nomli model yaratish:
+    (author, video, image, title, created_at)
+11. makemigrations, migrate

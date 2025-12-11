@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .profile-wrapper {
+        max-width: 935px;
+        margin: 40px auto 0;
+        display: flex;
+        gap: 40px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+    }
+
+    .profile-photo {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #dbdbdb;
+    }
+
+    .profile-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .profile-header h2 {
+        font-size: 28px;
+        font-weight: 300;
+        margin: 0;
+    }
+
+    .edit-btn {
+        padding: 5px 12px;
+        border-radius: 4px;
+        background: #fafafa;
+        border: 1px solid #dbdbdb;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .stats {
+        display: flex;
+        gap: 25px;
+        margin: 20px 0;
+        font-size: 16px;
+    }
+
+    .stats b {
+        font-weight: 600;
+    }
+
+    .bio {
+        font-size: 15px;
+        line-height: 20px;
+    }
+
+    /* POST GRID */
+    .posts-grid {
+        margin-top: 40px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
+
+    .post-item {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .post-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.3s;
+    }
+
+    .post-item:hover img {
+        opacity: 0.8;
+    }
+
+    /* MOBILE */
+    @media (max-width: 700px) {
+        .profile-wrapper {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stats {
+            justify-content: center;
+        }
+
+        .profile-header {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+
+    <!-- PROFILE PHOTO -->
+    <div class="profile-photo">
+        <img src="{{ request.user.avatar.url }}" alt="Profile Photo">
+    </div>
+
+    <!-- PROFILE INFO -->
+    <div class="profile-info">
+        
+        <div class="profile-header">
+            <h2>{{ user.username }}</h2>
+            <button class="edit-btn">Edit Profile</button>
+            <button class="edit-btn"><a href="{% url 'logout' %}">Logout</a></button>
+        </div>
+
+        <div class="stats">
+            <span><b>12</b> posts</span>
+            <span><b>340</b> followers</span>
+            <span><b>180</b> following</span>
+        </div>
+
+        <div class="bio">
+            <b>{{ user.first_name }} {{ user.last_name }}</b><br>
+            Django developer | Photographer<br>
+            📩 Contact me anytime
+        </div>
+
+    </div>
+
+</div>
+
+<!-- POSTS GRID -->
+<div class="posts-grid">
+    {% for post in posts %}
+        <div class="post-item">
+            <img src="{{ post.image.url }}" alt="Post">
+        </div>
+    {% empty %}
+        <p style="grid-column: 1 / -1; text-align:center; margin-top:20px;">No posts yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
