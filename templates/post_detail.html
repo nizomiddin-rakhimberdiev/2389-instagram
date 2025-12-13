@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block head %}
+<style>
+.post-detail {
+    max-width: 900px;
+    margin: 40px auto;
+    display: flex;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+/* LEFT MEDIA */
+.post-media {
+    flex: 1;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-media img,
+.post-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* RIGHT COMMENTS */
+.post-comments {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.comments-header {
+    padding: 12px;
+    border-bottom: 1px solid #efefef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comments-header img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.comments-header a {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none;
+}
+
+.comments-body {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.comment {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.comment b {
+    margin-right: 6px;
+}
+
+.comment-time {
+    font-size: 11px;
+    color: #8e8e8e;
+    margin-left: 4px;
+}
+
+/* ACTIONS */
+.comments-actions {
+    padding: 10px 12px;
+    border-top: 1px solid #efefef;
+}
+
+.likes {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.post-time {
+    font-size: 11px;
+    color: #8e8e8e;
+    margin-top: 4px;
+}
+
+/* ADD COMMENT */
+.add-comment {
+    border-top: 1px solid #efefef;
+    padding: 10px;
+}
+
+.add-comment form {
+    display: flex;
+    gap: 8px;
+}
+
+.add-comment input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.add-comment button {
+    border: none;
+    background: none;
+    color: #0095f6;
+    font-weight: 600;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+
+    <!-- LEFT -->
+    <div class="post-media">
+        {% if post.image %}
+            <img src="{{ post.image.url }}">
+        {% else %}
+            <video src="{{ post.video.url }}" controls></video>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT -->
+    <div class="post-comments">
+
+        <!-- HEADER -->
+        <div class="comments-header">
+            <img src="{{ post.author.avatar.url }}">
+            <a href="{% url 'profile' %}">
+                {{ post.author.username }}
+            </a>
+        </div>
+
+        <!-- COMMENTS -->
+        <div class="comments-body">
+
+            <!-- CAPTION -->
+            <div class="comment">
+                <b>{{ post.owner.username }}</b>
+                {{ post.title }}
+                <span class="comment-time">
+                    {{ post.created_at|naturaltime }}
+                </span>
+            </div>
+
+            {% for comment in comments %}
+            <div class="comment">
+                <b>{{ comment.author.username }}</b>
+                {{ comment.content }}
+                <span class="comment-time">
+                    {{ comment.created_at|naturaltime }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="comments-actions">
+            ❤️ 💬 📤
+            <div class="likes">
+                {{ post.likes.count }} likes
+            </div>
+            <div class="post-time">
+                {{ post.created_at|naturaltime }}
+            </div>
+        </div>
+
+        <!-- ADD COMMENT -->
+        <div class="add-comment">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="text" placeholder="Add a comment…" required>
+                <button>Post</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        border: 1px solid #dbdbdb;
+        border-radius: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+    }
+
+    .create-header {
+        padding: 14px;
+        border-bottom: 1px solid #dbdbdb;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .create-body {
+        padding: 20px;
+    }
+
+    .preview-box {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border: 2px dashed #dbdbdb;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8e8e8e;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+
+    .preview-box img,
+    .preview-box video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    input[type="file"] {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 90px;
+        resize: none;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #dbdbdb;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #a8a8a8;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: #0095f6;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-submit:active {
+        opacity: 0.85;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-container">
+
+    <div class="create-header">
+        Create new post
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="create-body">
+
+            <!-- PREVIEW -->
+            <div class="preview-box" id="previewBox">
+                Select image or video
+            </div>
+
+            <!-- IMAGE -->
+            <input type="file" name="image" accept="image/*" onchange="previewFile(this, 'image')">
+
+            <!-- VIDEO -->
+            <input type="file" name="video" accept="video/*" onchange="previewFile(this, 'video')">
+
+            <!-- TITLE -->
+            <textarea name="title" placeholder="Write a caption..."></textarea>
+
+            <button class="btn-submit">Share</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewFile(input, type) {
+        const previewBox = document.getElementById('previewBox');
+        previewBox.innerHTML = '';
+
+        const file = input.files[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+
+        if (type === 'image') {
+            const img = document.createElement('img');
+            img.src = url;
+            previewBox.appendChild(img);
+        } else {
+            const video = document.createElement('video');
+            video.src = url;
+            video.controls = true;
+            previewBox.appendChild(video);
+        }
+    }
+</script>
+{% endblock %}

@@ -1,12 +1,201 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block head %}
+<style>
+.feed {
+    max-width: 470px;
+    margin: 30px auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+.post {
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+/* HEADER */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+}
+
+.user-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.user-info img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.user-info a {
+    font-weight: 600;
+    font-size: 14px;
+    color: #262626;
+    text-decoration: none;
+}
+
+.post-time {
+    font-size: 12px;
+    color: #8e8e8e;
+}
+
+/* MEDIA */
+.post-media img,
+.post-media video {
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+}
+
+/* ACTIONS */
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 22px;
+}
+
+.left-actions span {
+    margin-right: 14px;
+    cursor: pointer;
+}
+
+/* CONTENT */
+.likes {
+    padding: 0 12px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.caption {
+    padding: 4px 12px;
+    font-size: 14px;
+}
+
+.caption b {
+    margin-right: 6px;
+}
+
+/* COMMENTS */
+.view-comments {
+    padding: 4px 12px;
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+.view-comments a {
+    text-decoration: none;
+    color: #8e8e8e;
+}
+
+.last-comment {
+    padding: 0 12px;
+    font-size: 14px;
+}
+
+.last-comment b {
+    margin-right: 6px;
+}
+
+/* ADD COMMENT */
+.add-comment {
+    border-top: 1px solid #efefef;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+.add-comment a {
+    color: #8e8e8e;
+    text-decoration: none;
+}
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="feed">
 
-  <main style="padding:28px;max-width:975px;margin:0 auto">
-    <h2 style="margin:0 0 12px">Nimadir page</h2>
-    <p style="color:var(--muted)">Bu navbar bitta HTML fayl ichida yozilgan. Mobil va desktop ko'rinishlari uchun moslashuvchan.</p>
-    <hr style="margin:18px 0;border:0;border-top:1px solid var(--border)" />
-    <p style="color:var(--muted)">Qaysi ikonalarni, ranglarni yoki textni o'zgartirmoqchisiz? Agar xohlasangiz, men bu faylni profil rasmiga haqiqiy URL joylash yoki JavaScript bilan qidiruvni aktiv qilish kabi qo'shimchalar bilan kengaytiraman.</p>
-  </main>
+{% for post in posts %}
+<div class="post">
 
+    <!-- HEADER -->
+    <div class="post-header">
+        <div class="user-info">
+            <img src="{{ post.author.avatar.url }}">
+            <div>
+                <a href="{% url 'profile' %}">
+                    {{ post.author.username }}
+                </a>
+                <div class="post-time">
+                    {{ post.created_at|naturaltime }}
+                </div>
+            </div>
+        </div>
+        ⋯
+    </div>
+
+    <!-- MEDIA -->
+    <div class="post-media">
+        {% if post.image %}
+            <img src="{{ post.image.url }}">
+        {% elif post.video %}
+            <video src="{{ post.video.url }}" controls></video>
+        {% endif %}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="post-actions">
+        <div class="left-actions">
+            <span>❤️</span>
+            <a href="">💬</a>
+            <span>📤</span>
+        </div>
+        <span>🔖</span>
+    </div>
+
+    <!-- LIKES -->
+    <div class="likes">
+        4 likes
+    </div>
+
+    <!-- CAPTION -->
+    <div class="caption">
+        <b>{{ post.author.username }}</b>
+        {{ post.title }}
+    </div>
+
+    <!-- VIEW COMMENTS -->
+    <div class="view-comments">
+        <a href="">
+            View all 23 comments
+        </a>
+    </div>
+
+    <!-- LAST COMMENT -->
+    {% if post.comments.last %}
+    <div class="last-comment">
+        <b>Nimadir</b>
+        Nimadir
+    </div>
+    {% endif %}
+
+    <!-- ADD COMMENT -->
+    <div class="add-comment">
+        <a href="{% url 'post_detail' post.id %}">
+            Add a comment…
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
 {% endblock %}
