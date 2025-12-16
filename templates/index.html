@@ -131,7 +131,7 @@
         <div class="user-info">
             <img src="{{ post.author.avatar.url }}">
             <div>
-                <a href="{% url 'profile' %}">
+                <a href="{% url 'profile' request.user.username %}">
                     {{ post.author.username }}
                 </a>
                 <div class="post-time">

@@ -14,8 +14,9 @@ def login_view(request):
                 return redirect('home')
     return render(request, 'login.html')
 
-def profile_view(request):
-    return render(request, 'profile.html')
+def profile_view(request, username):
+    user = CustomUser.objects.get(username=username)
+    return render(request, 'profile.html', {'user': user})
 
 def logout_view(request):
     logout(request)

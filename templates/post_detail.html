@@ -141,7 +141,7 @@
         <!-- HEADER -->
         <div class="comments-header">
             <img src="{{ post.author.avatar.url }}">
-            <a href="{% url 'profile' %}">
+            <a href="{% url 'profile' request.user.username %}">
                 {{ post.author.username }}
             </a>
         </div>

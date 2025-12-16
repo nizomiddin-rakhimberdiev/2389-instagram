@@ -68,6 +68,72 @@
     .mobile-menu a{display:block;padding:8px 10px;text-decoration:none;color:var(--accent);border-radius:6px}
     .mobile-menu a:hover{background:#f7f7f7}
 
+   /* SEARCH WRAPPER */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #fafafa;
+    width: 260px;
+}
+
+/* INPUT */
+.search-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 14px;
+    color: #262626;
+}
+
+.search-box input::placeholder {
+    color: #8e8e8e;
+}
+
+/* DROPDOWN */
+.search-results {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 9999;
+}
+
+/* ITEM */
+.search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #262626;
+}
+
+.search-item:hover {
+    background: #fafafa;
+}
+
+.search-item img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+
   </style>
   {% block head %}
 
@@ -88,14 +154,24 @@
 
       <!-- Center: Search -->
       <div class="search-wrap">
-        <label class="search" role="search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.4"/>
-          </svg>
-          <input type="search" placeholder="Search" aria-label="Search" />
-        </label>
-      </div>
+        </svg>
+
+        <input 
+            type="text"
+            id="searchInput"
+            placeholder="Search"
+            autocomplete="off"
+        >
+
+        <div id="searchResults" class="search-results"></div>
+    </div>
+</div>
+
 
       <!-- Right: actions -->
       <div class="actions">
@@ -121,7 +197,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.78 0L12 5.61l-1.02-1.02a5.5 5.5 0 1 0-7.78 7.78L12 21.3l8.8-8.8a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
-        <a href="{% url 'profile' %}">
+        <a href="{% url 'profile' request.user.username %}">
             <button class="icon-btn" id="profileBtn" aria-label="Profile" title="Profile">
           
             <img style="width: 100%;" src="{{ request.user.avatar.url }}" alt="avatar">
@@ -170,5 +246,60 @@
       if(!isClickInside) mobileMenu.classList.remove('show');
     });
   </script>
+<script>
+const input = document.getElementById("searchInput");
+const resultsBox = document.getElementById("searchResults");
+let controller;
+
+input.addEventListener("input", () => {
+    const query = input.value.trim();
+
+    if (!query) {
+        resultsBox.style.display = "none";
+        resultsBox.innerHTML = "";
+        return;
+    }
+
+    if (controller) controller.abort();
+    controller = new AbortController();
+
+    fetch(`/search/?q=${query}`, { signal: controller.signal })
+        .then(res => res.json())
+        .then(data => {
+            resultsBox.innerHTML = "";
+
+            if (data.results.length === 0) {
+                resultsBox.innerHTML = `
+                    <div style="padding:10px;color:#8e8e8e">
+                        No results
+                    </div>`;
+            } else {
+                data.results.forEach(user => {
+                    const a = document.createElement("a");
+                    a.className = "search-item";
+                    a.href = `/users/profile/${user.username}/`;
+
+                    a.innerHTML = `
+                        <img src="/media/${user.avatar}">
+                        <span>${user.username}</span>
+                    `;
+
+                    resultsBox.appendChild(a);
+                });
+            }
+
+            resultsBox.style.display = "block";
+        })
+        .catch(() => {});
+});
+
+document.addEventListener("click", e => {
+    if (!e.target.closest(".search-box")) {
+        resultsBox.style.display = "none";
+    }
+});
+</script>
+
+
 </body>
 </html>

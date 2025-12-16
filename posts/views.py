@@ -1,7 +1,9 @@
 from django.shortcuts import render,  redirect
 from django.contrib.auth.decorators import login_required
 from .models import Post, Comment, Like
+from users.models import CustomUser
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 # Create your views here.
 @login_required(login_url='login')
@@ -11,6 +13,25 @@ def home_page(request):
         'posts': posts
     }
     return render(request, 'index.html', context)
+
+@login_required
+def search_users(request):
+    query = request.GET.get("q", "")
+    results = []
+
+    if query:
+        users = list(
+            CustomUser.objects.filter(username__icontains=query)
+            .values("username", 'avatar', "id")
+        )
+    for user in users:
+            results.append({
+                "username": user["username"],
+                "avatar": request.build_absolute_uri(user['avatar']),
+            })
+
+    return JsonResponse({"results": users})
+
 
 @login_required(login_url='login')
 def add_comment(request, post_id):
