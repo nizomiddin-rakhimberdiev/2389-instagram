@@ -7,6 +7,7 @@ class Post(models.Model):
     video = models.FileField(upload_to='videos/', blank=True, null=True)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     title = models.CharField(max_length=150)
+    likes = models.ManyToManyField(CustomUser, related_name="liked_posts", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -22,13 +23,13 @@ class Comment(models.Model):
         return f'Comment by {self.author.username} on {self.post.title}'
     
 
-class Like(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Like(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f'Like by {self.user.username} on {self.post.title}'
+#     def __str__(self):
+#         return f'Like by {self.user.username} on {self.post.title}'
     
 Vazifa = """
 aiogramda state nima?
