@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+.messages {
+    max-width: 900px;
+    margin: 30px auto;
+    display: flex;
+    height: 80vh;
+    border: 1px solid #dbdbdb;
+    background: #fff;
+}
+
+/* LEFT */
+.chat-list {
+    width: 300px;
+    border-right: 1px solid #dbdbdb;
+    overflow-y: auto;
+}
+
+.chat-item {
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-item:hover {
+    background: #fafafa;
+}
+
+/* RIGHT */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 12px;
+    border-bottom: 1px solid #dbdbdb;
+    font-weight: 600;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.message.me {
+    text-align: right;
+    margin-bottom: 8px;
+}
+
+.message.other {
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.chat-input {
+    border-top: 1px solid #dbdbdb;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    border-radius: 20px;
+    border: 1px solid #dbdbdb;
+    padding: 8px 12px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="messages">
+
+    <!-- LEFT -->
+    <div class="chat-list">
+    {% for chat in chats %}
+        {% for u in chat.participants.all %}
+            {% if u != request.user %}
+            <a href="{% url 'chat_detail' chat.id %}" class="chat-item">
+                <img src="{{ u.avatar.url }}" style="width:40px;height:40px;border-radius:50%">
+                <b>{{ u.username }}</b>
+            </a>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>
+
+
+    <!-- RIGHT -->
+    <div class="chat-window">
+        <div class="chat-header" id="chatHeader">
+            Select a chat
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Message..." disabled>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

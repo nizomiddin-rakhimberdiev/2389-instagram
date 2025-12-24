@@ -40,7 +40,16 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'posts',
     'users',
+    "channels"
 ]
+
+ASGI_APPLICATION = "dinogram.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -125,6 +125,11 @@
         <div class="profile-header">
             <h2>{{ user.username }}</h2>
             <button class="edit-btn">Edit Profile</button>
+            {% if request.user != user %}
+    <a href="{% url 'start_chat' user.username %}" class="edit-btn">
+        Message
+    </a>
+{% endif %}
             <button class="edit-btn"><a href="{% url 'logout' %}">Logout</a></button>
         </div>
 

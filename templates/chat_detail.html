@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+.chat-page {
+    max-width: 900px;
+    margin: 30px auto;
+    display: flex;
+    height: 80vh;
+    border: 1px solid #dbdbdb;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+/* LEFT – chat list (optional agar inbox bilan birga bo‘lsa) */
+.chat-sidebar {
+    width: 300px;
+    border-right: 1px solid #dbdbdb;
+    padding: 12px;
+}
+
+/* RIGHT – chat */
+.chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+.chat-header {
+    padding: 12px;
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.chat-header img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+/* MESSAGES */
+.chat-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #fafafa;
+}
+
+.msg {
+    max-width: 70%;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+.msg.me {
+    background: #3797f0;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.msg.other {
+    background: #e4e6eb;
+    color: #000;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+}
+
+/* INPUT */
+.chat-input {
+    border-top: 1px solid #dbdbdb;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    border-radius: 20px;
+    border: 1px solid #dbdbdb;
+    padding: 8px 14px;
+    outline: none;
+}
+
+.chat-input button {
+    border: none;
+    background: #0095f6;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-page">
+
+    <!-- RIGHT CHAT -->
+    <div class="chat-window">
+
+        <!-- HEADER -->
+        <div class="chat-header">
+            {% for u in chat.participants.all %}
+                {% if u != request.user %}
+                    <img src="{{ u.avatar.url }}">
+                    {{ u.username }}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="chat-messages" id="chatMessages">
+            {% for msg in messages %}
+                <div class="msg {% if msg.sender == request.user %}me{% else %}other{% endif %}">
+                    {{ msg.text }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- INPUT -->
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Message..." onkeydown="if(event.key==='Enter'){sendMessage()}">
+
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const chatId = "{{ chat.id }}";
+const socket = new WebSocket(
+    `ws://${window.location.host}/ws/chat/${chatId}/`
+);
+
+const messagesBox = document.getElementById("chatMessages");
+
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    const div = document.createElement("div");
+    div.className = "msg " + (data.username === "{{ request.user.username }}" ? "me" : "other");
+    div.textContent = data.message;
+
+    messagesBox.appendChild(div);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+};
+
+function sendMessage() {
+    const input = document.getElementById("messageInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    socket.send(JSON.stringify({
+        "message": text
+    }));
+
+    input.value = "";
+}
+</script>
+{% endblock %}

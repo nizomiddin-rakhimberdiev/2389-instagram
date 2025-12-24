@@ -179,9 +179,9 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V11.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
 
-        <button class="icon-btn desktop-only" title="Messages" aria-label="Messages">
+        <a href="{% url 'messages' %}" class="icon-btn desktop-only" title="Messages" aria-label="Messages">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        </a>
 
         <button class="icon-btn desktop-only" title="Create" aria-label="Create">
           <a href="{% url 'create_post' %}">
@@ -298,6 +298,34 @@ document.addEventListener("click", e => {
         resultsBox.style.display = "none";
     }
 });
+</script>
+<script>
+let socket;
+let currentChat = null;
+
+function openChat(chatId) {
+    currentChat = chatId;
+    document.getElementById("chatHeader").innerText = "Chat " + chatId;
+    document.getElementById("messageInput").disabled = false;
+
+    socket = new WebSocket(`ws://${window.location.host}/ws/chat/${chatId}/`);
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const msgBox = document.getElementById("chatMessages");
+
+        const div = document.createElement("div");
+        div.className = "message";
+        div.innerHTML = `<b>${data.username}:</b> ${data.message}`;
+        msgBox.appendChild(div);
+    };
+}
+
+function sendMessage() {
+    const input = document.getElementById("messageInput");
+    socket.send(JSON.stringify({message: input.value}));
+    input.value = "";
+}
 </script>
 
 
