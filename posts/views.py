@@ -1,6 +1,6 @@
 from django.shortcuts import render,  redirect
 from django.contrib.auth.decorators import login_required
-from .models import Post, Comment, Like
+from .models import Post, Comment
 from users.models import CustomUser
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse

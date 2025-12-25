@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load humanize %}
 {% block head %}
 <style>
 .chat-page {
@@ -57,6 +57,11 @@
     border-radius: 18px;
     font-size: 14px;
     line-height: 18px;
+}
+
+.msg span{
+    float: right;
+    font-size: 10px;
 }
 
 .msg.me {
@@ -120,7 +125,8 @@
         <div class="chat-messages" id="chatMessages">
             {% for msg in messages %}
                 <div class="msg {% if msg.sender == request.user %}me{% else %}other{% endif %}">
-                    {{ msg.text }}
+                    {{ msg.text }} 
+                    <span>{{msg.created_at | naturaltime}}</span>
                 </div>
             {% endfor %}
         </div>
